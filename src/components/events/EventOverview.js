@@ -1,9 +1,21 @@
 import { useAuth } from "../../hook/AuthContext";
 import { useState, useEffect } from "react";
+import Event from "./Event";
+import EditEventModal from "./EditEventModal";
 
 const EventOverview = ({ reloadEvents, setReloadEvents }) => {
   const { user, ready, gapiInstance } = useAuth();
   const [events, setEvents] = useState([]);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState(undefined);
+  const handleOpenEdit = (index) => {
+    setCurrentEvent(events[index]);
+    console.log(events[index]);
+    setOpenEdit(true);
+  };
+  const handleEditClose = () => {
+    setOpenEdit(false);
+  };
 
   useEffect(() => {
     if (user && ready) {
@@ -54,37 +66,26 @@ const EventOverview = ({ reloadEvents, setReloadEvents }) => {
     }
   }, [reloadEvents, setReloadEvents, gapiInstance]);
 
-  const parseDateToMakeSense = (start, end) => {
-    return (
-      <>
-        {new Date(start).toLocaleDateString("cs-cz")}{" "}
-        {
-          <p>
-            {new Date(start).toLocaleTimeString()} -{" "}
-            {new Date(end).toLocaleTimeString()}
-          </p>
-        }
-      </>
-    );
-  };
   if (user) {
     return (
       <>
-        {events.map((event) => (
-          <div key={event.summary + (event.start.date || event.start.dateTime)}>
-            <span>
-              {event.start.date
-                ? event.start.date
-                : parseDateToMakeSense(
-                    event.start.dateTime,
-                    event.end.dateTime
-                  )}
-            </span>
-            <div className="border-2 border-purple-500 rounded-md p-2">
-              <p>{event.summary}</p>
-            </div>
-          </div>
-        ))}
+        {events &&
+          events.map((event, index) => (
+            <>
+              <Event
+                event={event}
+                index={index}
+                edit={handleOpenEdit}
+                key={JSON.stringify(event)}
+              />
+            </>
+          ))}
+        <EditEventModal
+          event={currentEvent}
+          isOpen={openEdit}
+          closeModal={handleEditClose}
+          reloadEvents={setReloadEvents}
+        />
       </>
     );
   }
