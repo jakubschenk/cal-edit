@@ -1,8 +1,9 @@
 import { useAuth } from "../../hook/AuthContext";
 import AppLogo from "./AppLogo";
 import UserInfo from "./UserInfo";
+import CalendarEventControls from "../controls/CalendarEventControls";
 
-const Header = () => {
+const Header = ({ reloadEvents }) => {
   const { user, signOut } = useAuth();
 
   if (user) {
@@ -14,7 +15,7 @@ const Header = () => {
         </div>
 
         <div className="flex justify-between items-center pt-6">
-          <div>placeholder</div>
+          <CalendarEventControls reloadEvents={reloadEvents} />
           <button
             onClick={signOut}
             className="border px-3 py-2 bg-blue-700 text-white rounded-lg"

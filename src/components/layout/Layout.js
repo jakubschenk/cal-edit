@@ -1,10 +1,10 @@
 import Header from "../header/Header";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, reloadEvents }) => {
   return (
     <>
       <header>
-        <Header />
+        <Header reloadEvents={reloadEvents} />
       </header>
       <main className="container pt-10">{children}</main>
     </>
