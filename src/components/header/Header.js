@@ -3,7 +3,7 @@ import AppLogo from "./AppLogo";
 import UserInfo from "./UserInfo";
 import CalendarEventControls from "../controls/CalendarEventControls";
 
-const Header = ({ reloadEvents }) => {
+const Header = ({ reloadEvents, toggleFilter, filterOpen }) => {
   const { user, signOut } = useAuth();
 
   if (user) {
@@ -15,7 +15,11 @@ const Header = ({ reloadEvents }) => {
         </div>
 
         <div className="flex justify-between items-center pt-6">
-          <CalendarEventControls reloadEvents={reloadEvents} />
+          <CalendarEventControls
+            reloadEvents={reloadEvents}
+            toggleFilter={toggleFilter}
+            filterOpen={filterOpen}
+          />
           <button
             onClick={signOut}
             className="border px-3 py-2 bg-blue-700 text-white rounded-lg"

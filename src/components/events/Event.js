@@ -1,7 +1,8 @@
 import { useState } from "react";
 import cn from "classnames";
+import Button from "../controls/Button";
 
-const Event = ({ event, index, edit }) => {
+const Event = ({ event, index, edit, deleteEvent }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const parseDateToMakeSense = (start, end) => {
@@ -40,7 +41,21 @@ const Event = ({ event, index, edit }) => {
             >
               {event.summary}
             </span>
-            {isOpen && <button onClick={() => edit(index)}>Edit</button>}
+            <div className="flex flex-col space-y-2">
+              {isOpen && (
+                <Button onClick={() => edit(index)} className="bg-blue-700">
+                  Edit
+                </Button>
+              )}
+              {isOpen && (
+                <Button
+                  onClick={() => deleteEvent(index)}
+                  className="bg-blue-700"
+                >
+                  Delete
+                </Button>
+              )}
+            </div>
           </div>
           {isOpen && (event.description || event.location) && (
             <div className="mt-2">

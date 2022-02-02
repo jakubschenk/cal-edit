@@ -2,12 +2,27 @@ import { useAuth } from "../../hook/AuthContext";
 import { useState, useEffect } from "react";
 import Event from "./Event";
 import EditEventModal from "./EditEventModal";
-
-const EventOverview = ({ reloadEvents, setReloadEvents }) => {
+const getNextYearDate = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = d.getMonth();
+  const day = d.getDate();
+  const c = new Date(year + 1, month, day);
+  return c;
+};
+const EventOverview = ({ reloadEvents, setReloadEvents, isFilterOpen }) => {
   const { user, ready, gapiInstance } = useAuth();
   const [events, setEvents] = useState([]);
   const [openEdit, setOpenEdit] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(undefined);
+  const [dateFrom, setDateFrom] = useState(new Date().toISOString());
+  const [dateTo, setDateTo] = useState(getNextYearDate().toISOString());
+
+  const handleFilterSubmit = (e) => {
+    e.preventDefault();
+    setReloadEvents(true);
+  };
+
   const handleOpenEdit = (index) => {
     setCurrentEvent(events[index]);
     console.log(events[index]);
@@ -16,17 +31,23 @@ const EventOverview = ({ reloadEvents, setReloadEvents }) => {
   const handleEditClose = () => {
     setOpenEdit(false);
   };
-
+  const handleEventDeletion = (index) => {
+    console.log("here");
+    gapiInstance.client.calendar.events
+      .delete({
+        calendarId: "primary",
+        eventId: events[index].id,
+      })
+      .then(() => setReloadEvents(true));
+  };
   useEffect(() => {
     if (user && ready) {
       const getCalendarEvents = () => {
-        const date = new Date();
-        date.setFullYear(date.getFullYear() + 1);
         gapiInstance.client.calendar.events
           .list({
             calendarId: "primary",
-            timeMin: new Date().toISOString(),
-            timeMax: date.toISOString(),
+            timeMin: dateFrom,
+            timeMax: dateTo,
             showDeleted: false,
             singleEvents: true,
             maxResults: 10,
@@ -44,13 +65,11 @@ const EventOverview = ({ reloadEvents, setReloadEvents }) => {
   useEffect(() => {
     if (gapiInstance) {
       const getCalendarEvents = () => {
-        const date = new Date();
-        date.setFullYear(date.getFullYear() + 1);
         gapiInstance.client.calendar.events
           .list({
             calendarId: "primary",
-            timeMin: new Date().toISOString(),
-            timeMax: date.toISOString(),
+            timeMin: dateFrom,
+            timeMax: dateTo,
             showDeleted: false,
             singleEvents: true,
             maxResults: 10,
@@ -69,23 +88,60 @@ const EventOverview = ({ reloadEvents, setReloadEvents }) => {
   if (user) {
     return (
       <>
-        {events &&
-          events.map((event, index) => (
-            <>
-              <Event
-                event={event}
-                index={index}
-                edit={handleOpenEdit}
-                key={JSON.stringify(event)}
+        {isFilterOpen && (
+          <div className="border-b-2 border-blue-700">
+            <span className="text-2xl mb-4">Filter events</span>
+            <form
+              onSubmit={handleFilterSubmit}
+              className="flex flex-col md:flex-row items-center md:space-x-4 md:justify-between"
+            >
+              Date from
+              <input
+                type="date"
+                defaultValue={dateFrom}
+                className="p-4 border rounded-md border-gray-500"
+                onChange={(e) =>
+                  setDateFrom(new Date(e.target.value).toISOString())
+                }
               />
-            </>
-          ))}
-        <EditEventModal
-          event={currentEvent}
-          isOpen={openEdit}
-          closeModal={handleEditClose}
-          reloadEvents={setReloadEvents}
-        />
+              Date to
+              <input
+                type="date"
+                defaultValue={dateTo}
+                className="p-4 border rounded-md border-gray-500"
+                onChange={(e) =>
+                  setDateTo(new Date(e.target.value).toISOString())
+                }
+              />
+              <input
+                type="submit"
+                className="my-2 px-4 py-2 text-white rounded-lg bg-blue-700 cursor-pointer"
+                value="Apply filter"
+              />
+            </form>
+          </div>
+        )}
+        <div>
+          <h1 className="text-4xl pb-2">Your events</h1>
+          {events &&
+            events.map((event, index) => (
+              <>
+                <Event
+                  event={event}
+                  index={index}
+                  edit={handleOpenEdit}
+                  deleteEvent={handleEventDeletion}
+                  key={JSON.stringify(event)}
+                />
+              </>
+            ))}
+          <EditEventModal
+            event={currentEvent}
+            isOpen={openEdit}
+            closeModal={handleEditClose}
+            reloadEvents={setReloadEvents}
+          />
+        </div>
       </>
     );
   }

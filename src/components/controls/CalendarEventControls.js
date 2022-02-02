@@ -2,7 +2,7 @@ import { useState } from "react";
 import CreateEventModal from "../events/CreateEventModal";
 import Button from "./Button";
 
-const CalendarEventControls = ({ reloadEvents }) => {
+const CalendarEventControls = ({ reloadEvents, filterOpen, toggleFilter }) => {
   const [createNewEventModalIsOpen, setCreateNewEventModalIsOpen] =
     useState(false);
 
@@ -18,7 +18,11 @@ const CalendarEventControls = ({ reloadEvents }) => {
       <Button onClick={openModal} className="bg-blue-700" key="new-event-btn">
         Create new event
       </Button>
-      <Button className="bg-blue-700" key="filter-events-btn">
+      <Button
+        onClick={() => toggleFilter(!filterOpen)}
+        className="bg-blue-700"
+        key="filter-events-btn"
+      >
         Filter events
       </Button>
       <CreateEventModal

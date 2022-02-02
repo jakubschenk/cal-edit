@@ -7,8 +7,14 @@ import EventOverview from "./events/EventOverview";
 const MainView = () => {
   const { user, signIn } = useAuth();
   const [reloadEvents, setReloadEvents] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+
   const handleReloadEvents = (value) => {
     setReloadEvents(value);
+  };
+
+  const handleFilter = (value) => {
+    setFilterOpen(value);
   };
   if (!user) {
     return (
@@ -21,12 +27,16 @@ const MainView = () => {
   }
 
   return (
-    <Layout reloadEvents={handleReloadEvents}>
+    <Layout
+      reloadEvents={handleReloadEvents}
+      toggleFilter={handleFilter}
+      filterOpen={filterOpen}
+    >
       <div className="space-y-2">
-        <h1 className="text-4xl pb-2">Your events</h1>
         <EventOverview
           reloadEvents={reloadEvents}
           setReloadEvents={handleReloadEvents}
+          isFilterOpen={filterOpen}
         />
       </div>
     </Layout>
