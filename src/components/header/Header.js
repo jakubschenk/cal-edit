@@ -13,7 +13,7 @@ const Header = () => {
           <UserInfo user={user} />
         </div>
 
-        <div className="flex justify-between items-center pt-2">
+        <div className="flex justify-between items-center pt-6">
           <div>placeholder</div>
           <button
             onClick={signOut}
